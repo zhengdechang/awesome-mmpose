@@ -20,6 +20,7 @@ from mmpose.utils import adapt_mmdet_pipeline
 
 try:
     from mmdet.apis import inference_detector, init_detector
+
     has_mmdet = True
 except (ImportError, ModuleNotFoundError):
     has_mmdet = False
@@ -51,7 +52,7 @@ def process_one_image(args,
         img = mmcv.imread(img, channel_order='rgb')
     elif isinstance(img, np.ndarray):
         img = mmcv.bgr2rgb(img)
-    
+
     if args.black_background:
         img = np.zeros_like(img, dtype=np.uint8)
 
@@ -65,7 +66,6 @@ def process_one_image(args,
             draw_bbox=args.draw_bbox,
             show_kpt_idx=args.show_kpt_idx,
             skeleton_style=args.skeleton_style,
-            # black_background=args.black_background,
             show=args.show,
             wait_time=show_interval,
             kpt_thr=args.kpt_thr)
@@ -96,7 +96,7 @@ def main():
         type=str,
         default='',
         help='root of the output img file. '
-        'Default not saving the visualization images.')
+             'Default not saving the visualization images.')
     parser.add_argument(
         '--save-predictions',
         action='store_true',
@@ -156,9 +156,9 @@ def main():
         '--alpha', type=float, default=0.8, help='The transparency of bboxes')
     parser.add_argument(
         '--draw-bbox', action='store_true', help='Draw bboxes of instances')
-    
+
     parser.add_argument(
-    '--black-background',action='store_true',help='Plot predictions on a black image')
+        '--black-background', action='store_true', help='Plot predictions on a black image')
 
     assert has_mmdet, 'Please install mmdet to run the demo.'
 
@@ -180,7 +180,7 @@ def main():
     if args.save_predictions:
         assert args.output_root != ''
         args.pred_save_path = f'{args.output_root}/results_' \
-            f'{os.path.splitext(os.path.basename(args.input))[0]}.json'
+                              f'{os.path.splitext(os.path.basename(args.input))[0]}.json'
 
     # build detector
     detector = init_detector(
@@ -245,8 +245,6 @@ def main():
             pred_instances = process_one_image(args, frame, detector,
                                                pose_estimator, visualizer,
                                                0.001)
-            
-            print(split_instances(pred_instances),'split_instances(pred_instances)')
 
             if args.save_predictions:
                 # save prediction results
@@ -258,8 +256,6 @@ def main():
             # output videos
             if output_file:
                 frame_vis = visualizer.get_image()
-                # if args.black_background:
-                #     frame_vis = np.zeros_like(frame_vis, dtype=np.uint8)
 
                 if video_writer is None:
                     fourcc = cv2.VideoWriter_fourcc(*'mp4v')

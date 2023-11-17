@@ -34,6 +34,9 @@ def process_one_image(args,
     elif isinstance(img, np.ndarray):
         img = mmcv.bgr2rgb(img)
 
+    if args.black_background:
+        img = np.zeros_like(img, dtype=np.uint8)
+
     if visualizer is not None:
         visualizer.add_datasample(
             'result',
@@ -95,6 +98,10 @@ def parse_args():
         type=int,
         default=1,
         help='Link thickness for visualization')
+
+    parser.add_argument(
+        '--black-background', action='store_true', help='Plot predictions on a black image')
+
     parser.add_argument(
         '--show-interval', type=int, default=0, help='Sleep seconds per frame')
     args = parser.parse_args()
