@@ -6,6 +6,22 @@
 
 本项目基于 [MMPOSE](https://github.com/open-mmlab/mmpose.git) 开发，更多的样例请参考 [MMPOSE demos](https://mmpose.readthedocs.io/en/latest/demos.html)。
 
+## 安装CUDA
+如果你已经安装Anaconda3，请略过这个步骤
+
+```shell
+wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+
+bash Anaconda3-2021.05-Linux-x86_64.sh
+
+source ~/.bashrc
+```
+
+测试是否安装成功
+```
+conda list
+```
+
 ## 安装步骤
 
 以下是安装步骤，需要注意的是，这些步骤可能会因为你的环境而有所不同。

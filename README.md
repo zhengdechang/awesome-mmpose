@@ -8,6 +8,23 @@ Sure, here is the English version of the README:
 
 This project is based on [MMPOSE](https://github.com/open-mmlab/mmpose.git). For more examples, please refer to [MMPOSE demos](https://mmpose.readthedocs.io/en/latest/demos.html).
 
+## CUDA Installation
+Skip this step if you have already installed Anaconda3.
+
+```shell
+wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+
+bash Anaconda3-2021.05-Linux-x86_64.sh
+
+source ~/.bashrc
+```
+
+Test if the installation was successful
+```
+conda list
+```
+Please note to replace the Anaconda3 installation script link with the latest one from the official Anaconda website.
+
 ## Installation Steps
 
 The following are the installation steps. Please note that these steps may vary depending on your environment.
