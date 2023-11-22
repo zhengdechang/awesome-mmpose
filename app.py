@@ -24,6 +24,7 @@ from mmpose.utils import adapt_mmdet_pipeline
 
 try:
     from mmdet.apis import inference_detector, init_detector
+
     has_mmdet = True
 except (ImportError, ModuleNotFoundError):
     has_mmdet = False
@@ -49,7 +50,8 @@ def process_one_image(args,
                       pose_estimator,
                       visualizer=None,
                       show_interval=0,
-                      draw_heatmap=False):
+                      draw_heatmap=False,
+                      black_background=False):
     """Visualize predicted keypoints (and heatmaps) of one image."""
 
     # predict bbox
@@ -70,6 +72,9 @@ def process_one_image(args,
         img = mmcv.imread(img, channel_order='rgb')
     elif isinstance(img, np.ndarray):
         img = mmcv.bgr2rgb(img)
+
+    if black_background:
+        img = np.zeros_like(img, dtype=np.uint8)
 
     if visualizer is not None:
         visualizer.add_datasample(
@@ -94,6 +99,7 @@ def process_one_image(args,
 
 def predict(input,
             draw_heatmap=False,
+            black_background=False,
             model_type='body',
             skeleton_style='mmpose',
             input_type='image'):
@@ -130,7 +136,7 @@ def predict(input,
         type=str,
         default='',
         help='root of the output img file. '
-        'Default not saving the visualization images.')
+             'Default not saving the visualization images.')
     parser.add_argument(
         '--show',
         action='store_true',
@@ -246,7 +252,8 @@ def predict(input,
             detector,
             pose_estimator,
             visualizer,
-            draw_heatmap=draw_heatmap)
+            draw_heatmap=draw_heatmap,
+            black_background=black_background)
         return visualizer.get_image()
 
     elif input_type == 'video':
@@ -297,7 +304,8 @@ def predict(input,
                     draw_heatmap=True)
             else:
                 pred_instances = process_one_image(args, frame, detector,
-                                                   pose_estimator)
+                                                   pose_estimator,
+                                                   black_background=black_background)
                 # visualization
                 visualizer.draw_pose(frame, pred_instances)
                 # cv2.imshow('MMPose Demo [Press ESC to Exit]', frame)
@@ -338,11 +346,11 @@ def predict(input,
 news1 = '2023-8-1: We have supported [DWPose](https://arxiv.org/pdf/2307.15880.pdf) as the default `wholebody` model.'  # noqa
 news2 = '2023-9-25: We release an alpha version of RTMW model, the technical report will be released soon.'  # noqa
 with gr.Blocks() as demo:
-
     with gr.Tab('Upload-Image'):
         input_img = gr.Image(type='numpy')
         button = gr.Button('Inference', variant='primary')
         hm = gr.Checkbox(label='draw-heatmap', info='Whether to draw heatmap')
+        bb = gr.Checkbox(label='black-background', info='Whether to use black background')  # new Checkbox
         model_type = gr.Dropdown(
             ['body', 'face', 'wholebody(rtmw)', 'wholebody(dwpose)'],
             label='Keypoint Type',
@@ -359,12 +367,13 @@ with gr.Blocks() as demo:
         input_type = 'image'
         button.click(
             partial(predict, input_type=input_type),
-            [input_img, hm, model_type], out_image)
+            [input_img, hm, bb, model_type], out_image)
 
     with gr.Tab('Webcam-Image'):
         input_img = gr.Image(source='webcam', type='numpy')
         button = gr.Button('Inference', variant='primary')
         hm = gr.Checkbox(label='draw-heatmap', info='Whether to draw heatmap')
+        bb = gr.Checkbox(label='black-background', info='Whether to use black background')  # new Checkbox
         model_type = gr.Dropdown(
             ['body', 'face', 'wholebody(rtmw)', 'wholebody(dwpose)'],
             label='Keypoint Type',
@@ -381,12 +390,13 @@ with gr.Blocks() as demo:
         input_type = 'image'
         button.click(
             partial(predict, input_type=input_type),
-            [input_img, hm, model_type], out_image)
+            [input_img, hm, bb, model_type], out_image)
 
     with gr.Tab('Upload-Video'):
         input_video = gr.Video(type='mp4')
         button = gr.Button('Inference', variant='primary')
         hm = gr.Checkbox(label='draw-heatmap', info='Whether to draw heatmap')
+        bb = gr.Checkbox(label='black-background', info='Whether to use black background')  # new Checkbox
         model_type = gr.Dropdown(
             ['body', 'face', 'wholebody(rtmw)', 'wholebody(dwpose)'],
             label='Keypoint Type',
@@ -403,12 +413,13 @@ with gr.Blocks() as demo:
         input_type = 'video'
         button.click(
             partial(predict, input_type=input_type),
-            [input_video, hm, model_type], out_video)
+            [input_video, hm, bb, model_type], out_video)
 
     with gr.Tab('Webcam-Video'):
         input_video = gr.Video(source='webcam', format='mp4')
         button = gr.Button('Inference', variant='primary')
         hm = gr.Checkbox(label='draw-heatmap', info='Whether to draw heatmap')
+        bb = gr.Checkbox(label='black-background', info='Whether to use black background')  # new Checkbox
         model_type = gr.Dropdown(
             ['body', 'face', 'wholebody(rtmw)', 'wholebody(dwpose)'],
             label='Keypoint Type',
@@ -425,7 +436,7 @@ with gr.Blocks() as demo:
         input_type = 'video'
         button.click(
             partial(predict, input_type=input_type),
-            [input_video, hm, model_type], out_video)
+            [input_video, hm, bb, model_type], out_video)
 
 gr.close_all()
 demo.queue()
