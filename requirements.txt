@@ -2,3 +2,5 @@
 -r requirements/runtime.txt
 -r requirements/tests.txt
 -r requirements/optional.txt
+
+gradio==3.15.0
